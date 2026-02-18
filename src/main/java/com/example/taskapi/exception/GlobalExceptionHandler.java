@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -63,5 +65,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         m.put("field", fe.getField());
         m.put("message", fe.getDefaultMessage());
         return m;
+    }
+
+    // 400 Parameter type mismatch (例: status=XXX)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 400);
+        body.put("error", "Bad Request");
+        body.put("message", "Invalid parameter: " + ex.getName());
+
+        return ResponseEntity.badRequest().body(body);
     }
 }

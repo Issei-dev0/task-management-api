@@ -10,9 +10,9 @@ import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.example.taskapi.TaskStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -46,7 +46,7 @@ public class TaskController {
     public Page<TaskResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) TaskStatus status,
-            @ParameterObject Pageable pageable
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt")Pageable pageable
     ) {
         return taskService.search(q, status, pageable)
                 .map(this::toResponse);

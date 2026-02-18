@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.taskapi.TaskStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+
 @Service
 public class TaskService {
 
@@ -49,4 +54,22 @@ public class TaskService {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + id));
     }
+
+    public Page<Task> search(String q, TaskStatus status, Pageable pageable) {
+
+        boolean hasQ = (q != null && !q.isBlank());
+        boolean hasStatus = (status != null);
+
+        if (hasQ && hasStatus) {
+            return taskRepository.findByTitleContainingIgnoreCaseAndStatus(q, status, pageable);
+        }
+        if (hasQ) {
+            return taskRepository.findByTitleContainingIgnoreCase(q, pageable);
+        }
+        if (hasStatus) {
+            return taskRepository.findByStatus(status, pageable);
+        }
+        return taskRepository.findAll(pageable);
+    }
+
 }

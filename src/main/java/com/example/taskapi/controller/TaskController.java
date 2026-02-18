@@ -7,10 +7,14 @@ import com.example.taskapi.dto.TaskResponse;
 import com.example.taskapi.dto.TaskUpdateRequest;
 import com.example.taskapi.service.TaskService;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import com.example.taskapi.TaskStatus;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -39,9 +43,15 @@ public class TaskController {
     // ✅ 一覧（ページング）
     // /api/tasks?page=0&size=10&sort=createdAt,desc
     @GetMapping
-    public Page<TaskResponse> list(Pageable pageable) {
-        return taskService.findAll(pageable).map(this::toResponse);
+    public Page<TaskResponse> list(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) TaskStatus status,
+            @ParameterObject Pageable pageable
+    ) {
+        return taskService.search(q, status, pageable)
+                .map(this::toResponse);
     }
+
 
     // ✅ 詳細
     @GetMapping("/{id}")

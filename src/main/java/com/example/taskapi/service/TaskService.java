@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.taskapi.TaskStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 @Service
@@ -25,6 +26,7 @@ public class TaskService {
     }
 
     public Task create(Task task) {
+        log.info("Creating task title={}", task.getTitle());
         return taskRepository.save(task);
     }
 
@@ -34,8 +36,7 @@ public class TaskService {
     }
 
     // （任意）残してOK。将来消してもいい
-    public List<Task> findAll() {
-        return taskRepository.findAll();
+    public List<Task> findAll() {return taskRepository.findAll();
     }
 
     public Optional<Task> findById(Long id) {
@@ -43,10 +44,12 @@ public class TaskService {
     }
 
     public Task update(Task task) {
+        log.info("Updating task id={}", task.getId());
         return taskRepository.save(task);
     }
 
     public void delete(Long id) {
+        log.info("Deleting task id={}", id);
         taskRepository.deleteById(id);
     }
 
@@ -71,5 +74,8 @@ public class TaskService {
         }
         return taskRepository.findAll(pageable);
     }
+
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
+
 
 }

@@ -18,13 +18,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     // 404
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
 
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());

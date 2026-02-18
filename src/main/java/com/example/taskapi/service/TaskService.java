@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository;
+    private final TaskRepository taskRepository;//意図しない再代入を防ぐ
 
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;

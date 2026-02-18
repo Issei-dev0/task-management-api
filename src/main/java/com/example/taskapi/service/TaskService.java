@@ -1,6 +1,7 @@
 package com.example.taskapi.service;
 
 import com.example.taskapi.Task;
+import com.example.taskapi.exception.ResourceNotFoundException;
 import com.example.taskapi.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ public class TaskService {
 
     public Task getById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + id));
     }
 
 }

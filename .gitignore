@@ -1,0 +1,59 @@
+############################
+# Maven
+############################
+target/
+dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+############################
+# Logs
+############################
+*.log
+logs/
+
+############################
+# IDE
+############################
+.idea/
+*.iml
+*.ipr
+*.iws
+
+############################
+# VSCode
+############################
+.vscode/
+
+############################
+# OS
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# Environment files
+############################
+.env
+.env.*
+application-local.yml
+application-local.properties
+
+############################
+# H2 (file mode)
+############################
+*.mv.db
+*.trace.db
+
+############################
+# Docker
+############################
+docker-compose.override.yml
+
+############################
+# Node (将来フロント追加する場合)
+############################
+node_modules/

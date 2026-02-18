@@ -4,14 +4,13 @@ import com.example.taskapi.Task;
 import com.example.taskapi.TaskStatus;
 import com.example.taskapi.dto.TaskCreateRequest;
 import com.example.taskapi.dto.TaskResponse;
+import com.example.taskapi.dto.TaskUpdateRequest;
 import com.example.taskapi.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.example.taskapi.dto.TaskUpdateRequest;
-
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -23,6 +22,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    // ✅ 作成
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TaskResponse create(@Valid @RequestBody TaskCreateRequest req) {
@@ -36,11 +36,45 @@ public class TaskController {
         return toResponse(saved);
     }
 
+    // ✅ 一覧（ページング）
+    // /api/tasks?page=0&size=10&sort=createdAt,desc
     @GetMapping
-    public List<TaskResponse> list() {
-        return taskService.findAll().stream().map(this::toResponse).toList();
+    public Page<TaskResponse> list(Pageable pageable) {
+        return taskService.findAll(pageable).map(this::toResponse);
     }
 
+    // ✅ 詳細
+    @GetMapping("/{id}")
+    public TaskResponse get(@PathVariable Long id) {
+        return toResponse(taskService.getById(id));
+    }
+
+    // ✅ 更新（全置換寄り）
+    @PutMapping("/{id}")
+    public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskUpdateRequest req) {
+        Task task = taskService.getById(id);
+
+        task.setTitle(req.getTitle());
+        task.setDescription(req.getDescription());
+        if (req.getStatus() != null) {
+            task.setStatus(req.getStatus());
+        }
+        task.setDueDate(req.getDueDate());
+
+        Task saved = taskService.update(task);
+        return toResponse(saved);
+    }
+
+    // ✅ 削除
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        // 存在しない場合も404にしたいなら、先にgetByIdしてからdeleteする
+        taskService.getById(id);
+        taskService.delete(id);
+    }
+
+    // --- Entity -> Response DTO 変換 ---
     private TaskResponse toResponse(Task task) {
         TaskResponse res = new TaskResponse();
         res.setId(task.getId());
@@ -52,29 +86,4 @@ public class TaskController {
         res.setUpdatedAt(task.getUpdatedAt());
         return res;
     }
-
-    @GetMapping("/{id}")
-    public TaskResponse get(@PathVariable Long id) {
-        return toResponse(taskService.getById(id));
-    }
-
-    @PutMapping("/{id}")
-    public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskUpdateRequest req) {
-        Task task = taskService.getById(id);
-        task.setTitle(req.getTitle());
-        task.setDescription(req.getDescription());
-        if (req.getStatus() != null) task.setStatus(req.getStatus());
-        task.setDueDate(req.getDueDate());
-
-        return toResponse(taskService.update(task));
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        taskService.delete(id);
-    }
-
-
-
 }

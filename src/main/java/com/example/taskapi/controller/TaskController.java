@@ -8,6 +8,8 @@ import com.example.taskapi.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import com.example.taskapi.dto.TaskUpdateRequest;
+
 
 import java.util.List;
 
@@ -50,4 +52,29 @@ public class TaskController {
         res.setUpdatedAt(task.getUpdatedAt());
         return res;
     }
+
+    @GetMapping("/{id}")
+    public TaskResponse get(@PathVariable Long id) {
+        return toResponse(taskService.getById(id));
+    }
+
+    @PutMapping("/{id}")
+    public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskUpdateRequest req) {
+        Task task = taskService.getById(id);
+        task.setTitle(req.getTitle());
+        task.setDescription(req.getDescription());
+        if (req.getStatus() != null) task.setStatus(req.getStatus());
+        task.setDueDate(req.getDueDate());
+
+        return toResponse(taskService.update(task));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        taskService.delete(id);
+    }
+
+
+
 }

@@ -16,6 +16,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.verifyNoInteractions;
+import com.example.taskapi.exception.ResourceNotFoundException;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
@@ -67,5 +70,18 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.details[0].field").value("title"));
                 verifyNoInteractions(taskService);
+    }
+
+    @Test
+    void get_returns404_whenTaskNotFound() throws Exception {
+        // serviceが例外を投げる想定（Controllerはそれを受けて404になる）
+        when(taskService.getById(999L))
+                .thenThrow(new ResourceNotFoundException("Task not found: 999"));
+
+        mockMvc.perform(get("/api/tasks/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Task not found: 999"));
     }
 }

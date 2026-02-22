@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class TaskCreateRequest {
 
-    @NotBlank
+    @NotBlank(message = "title is required")
     @Size(max = 100)
     private String title;
 

@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
@@ -48,5 +49,23 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Write report"))
                 .andExpect(jsonPath("$.status").value("TODO"));
+    }
+
+    @Test
+    void create_returns400_whenTitleIsBlank() throws Exception {
+        // serviceは呼ばれない想定だが、念のためstub不要（呼ばれたらテストで検知するならverifyする）
+        String json =
+                "{\n" +
+                        "  \"title\": \"\",\n" +
+                        "  \"description\": \"Finish monthly report\"\n" +
+                        "}";
+
+        mockMvc.perform(post("/api/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.details[0].field").value("title"));
+                verifyNoInteractions(taskService);
     }
 }

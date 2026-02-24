@@ -79,3 +79,5 @@ class TaskRepositoryTest {
         return t;
     }
 }
+//クエリの正当性確認
+//DBアクセス検証

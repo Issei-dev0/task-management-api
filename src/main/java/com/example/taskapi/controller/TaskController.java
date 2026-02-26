@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RestController
@@ -26,10 +27,12 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    // ✅ 作成
+    // ✅ 作成（ADMINのみ）
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskResponse create(@Valid @RequestBody TaskCreateRequest req) {
+    public TaskResponse create(@Valid @RequestBody TaskCreateRequest req)
+    {
         Task task = new Task();
         task.setTitle(req.getTitle());
         task.setDescription(req.getDescription());
@@ -59,8 +62,9 @@ public class TaskController {
         return toResponse(taskService.getById(id));
     }
 
-    // ✅ 更新（全置換寄り）
+    // ✅ 更新（ADMINのみ）
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskUpdateRequest req) {
         Task task = taskService.getById(id);
 
@@ -75,8 +79,9 @@ public class TaskController {
         return toResponse(saved);
     }
 
-    // ✅ 削除
+    // ✅ 削除（ADMINのみ）
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         // 存在しない場合も404にしたいなら、先にgetByIdしてからdeleteする

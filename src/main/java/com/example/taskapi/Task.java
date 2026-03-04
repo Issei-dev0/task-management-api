@@ -2,9 +2,10 @@ package com.example.taskapi;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import jakarta.persistence.Column;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
 public class Task {
     public Long getId() {
         return id;
@@ -71,6 +72,12 @@ public class Task {
 
     @Column(length = 1000)
     private String description;
+
+    @Column(nullable = false, updatable = false)
+    private String ownerUsername;
+
+    public String getOwnerUsername() { return ownerUsername; }
+    public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status = TaskStatus.TODO;

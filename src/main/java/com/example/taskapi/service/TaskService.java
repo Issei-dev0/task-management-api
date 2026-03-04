@@ -13,6 +13,8 @@ import java.util.Optional;
 import com.example.taskapi.TaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.taskapi.security.SecurityUtil;
+import org.springframework.security.access.AccessDeniedException;
 
 
 
@@ -26,7 +28,11 @@ public class TaskService {
     }
 
     public Task create(Task task) {
-        log.info("Creating task title={}", task.getTitle());
+        String me = SecurityUtil.currentUsername();
+        if (me == null) {
+            throw new AccessDeniedException("Unauthenticated");
+        }
+        task.setOwnerUsername(me);
         return taskRepository.save(task);
     }
 
@@ -54,25 +60,60 @@ public class TaskService {
     }
 
     public Task getById(Long id) {
-        return taskRepository.findById(id)
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + id));
+
+        String me = SecurityUtil.currentUsername();
+
+        // 未認証はここに来ない想定だが、念のため
+        if (me == null) {
+            throw new AccessDeniedException("Unauthenticated");
+        }
+
+        // ADMINは全許可。それ以外は所有者だけ
+        if (!SecurityUtil.isAdmin() && !me.equals(task.getOwnerUsername())) {
+            throw new AccessDeniedException("Not your task");
+        }
+
+        return task;
     }
 
     public Page<Task> search(String q, TaskStatus status, Pageable pageable) {
 
+        String me = SecurityUtil.currentUsername();
+        if (me == null) {
+            throw new AccessDeniedException("Unauthenticated");
+        }
+
+        boolean admin = SecurityUtil.isAdmin();
         boolean hasQ = (q != null && !q.isBlank());
         boolean hasStatus = (status != null);
 
+        // ADMIN は全件検索（今まで通り）
+        if (admin) {
+            if (hasQ && hasStatus) {
+                return taskRepository.findByTitleContainingIgnoreCaseAndStatus(q, status, pageable);
+            }
+            if (hasQ) {
+                return taskRepository.findByTitleContainingIgnoreCase(q, pageable);
+            }
+            if (hasStatus) {
+                return taskRepository.findByStatus(status, pageable);
+            }
+            return taskRepository.findAll(pageable);
+        }
+
+        // USER は「自分のタスクだけ」
         if (hasQ && hasStatus) {
-            return taskRepository.findByTitleContainingIgnoreCaseAndStatus(q, status, pageable);
+            return taskRepository.findByOwnerUsernameAndTitleContainingIgnoreCaseAndStatus(me, q, status, pageable);
         }
         if (hasQ) {
-            return taskRepository.findByTitleContainingIgnoreCase(q, pageable);
+            return taskRepository.findByOwnerUsernameAndTitleContainingIgnoreCase(me, q, pageable);
         }
         if (hasStatus) {
-            return taskRepository.findByStatus(status, pageable);
+            return taskRepository.findByOwnerUsernameAndStatus(me, status, pageable);
         }
-        return taskRepository.findAll(pageable);
+        return taskRepository.findByOwnerUsername(me, pageable);
     }
 
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);

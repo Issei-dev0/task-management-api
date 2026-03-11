@@ -228,6 +228,84 @@ GET /api/tasks?status=TODO
 
 ---
 
+---
+
+# API Example
+
+## 1. Login
+
+JWTトークンを取得します。
+
+Request
+
+```
+POST /api/auth/login
+```
+
+Example body
+
+```json
+{
+  "username": "user",
+  "password": "password"
+}
+```
+
+Response
+
+```json
+{
+  "token": "jwt_token_here"
+}
+```
+
+---
+
+## 2. Create Task
+
+JWTトークンを使用してタスクを作成します。
+
+Request
+
+```
+POST /api/tasks
+Authorization: Bearer {token}
+```
+
+Example body
+
+```json
+{
+  "title": "Buy book",
+  "description": "Spring Boot book",
+  "status": "TODO"
+}
+```
+
+---
+
+## 3. Get Tasks
+
+タスク一覧を取得します。
+
+```
+GET /api/tasks?page=0&size=20
+Authorization: Bearer {token}
+```
+
+---
+
+## 4. Search Tasks
+
+タイトルまたはステータスで検索できます。
+
+```
+GET /api/tasks?q=book
+GET /api/tasks?status=TODO
+```
+
+Authorization header is required for all task endpoints.
+
 # Security Design
 
 ## JWT Authentication

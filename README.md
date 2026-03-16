@@ -114,7 +114,7 @@ EntityをそのままAPIの入出力に使わず、DTOを分離しました。
 
 - エラーレスポンスの形式を統一できる
 - Controllerごとに個別の例外処理を書かなくて済む
-- 400 / 401 / 404 などの扱いを明確にできる
+- 400 / 401 / 403 / 404 などの扱いを明確にできる
 
 API利用者にとっても、一定の形式でエラー内容を確認できるようになります。
 
@@ -386,11 +386,12 @@ http://localhost:8080/swagger-ui/index.html
 
 # Error Handling
 
-| Status | Description |
-|---|---|
-| 400 | Validation Error |
-| 401 | Unauthorized |
-| 404 | Resource Not Found |
+| Status | Description       |
+|--------|-------------------|
+| 400    | Validation Error  |
+| 401    | Unauthorized      |
+| 403    | Forbidden         |
+| 404    | Resource Not Found |
 
 ---
 

@@ -12,5 +12,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  app:
+    build: .
+    container_name: taskapi-app
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskapi
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SECURITY_JWT_SECRET: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+      SECURITY_JWT_EXPIRATION_MINUTES: 60
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:

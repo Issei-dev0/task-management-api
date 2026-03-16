@@ -82,7 +82,7 @@ public class TaskService {
 
         String me = SecurityUtil.currentUsername();
         if (me == null) {
-            throw new AccessDeniedException("Unauthenticated");
+            throw new IllegalStateException("Authentication not found in security context");
         }
 
         boolean admin = SecurityUtil.isAdmin();

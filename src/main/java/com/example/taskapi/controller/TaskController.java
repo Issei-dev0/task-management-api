@@ -46,6 +46,7 @@ public class TaskController {
     // ✅ 一覧（ページング）
     // /api/tasks?page=0&size=10&sort=createdAt,desc
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public Page<TaskResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) TaskStatus status,
@@ -58,6 +59,7 @@ public class TaskController {
 
     // ✅ 詳細
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public TaskResponse get(@PathVariable Long id) {
         return toResponse(taskService.getById(id));
     }

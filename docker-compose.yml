@@ -1,4 +1,3 @@
-
 services:
   db:
     image: postgres:16
@@ -6,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: taskapi
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -21,8 +20,8 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskapi
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SECURITY_JWT_SECRET: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SECURITY_JWT_SECRET: ${JWT_SECRET}
       SECURITY_JWT_EXPIRATION_MINUTES: 60
     ports:
       - "8080:8080"

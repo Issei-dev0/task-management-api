@@ -222,8 +222,6 @@ Hibernateの自動DDLに依存せず、DB変更を明示的に管理すること
 
 再現性を高めるために、DB環境はComposeで管理しています。
 
-# Features
-
 ## Authentication
 
 JWTトークンを使用した認証を実装しています。
